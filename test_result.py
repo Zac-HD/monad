@@ -5,6 +5,7 @@ import functools
 import operator as op
 
 import hypothesis.strategies as st
+from hypothesis import given
 
 from result import Result
 
@@ -14,21 +15,19 @@ def test_docs():
     doctest.testfile('README.rst')
 
 
-@st.composite
-def test_integer_maths(draw):
+integer_funcs = st.tuples(
+    st.sampled_from([op.add, op.sub, op.floordiv, op.mul]),
+    st.integers()
+    ).map(lambda v: functools.partial(v[0], v[1]))
+
+@given(initial=st.integers(), funcs=st.lists(integer_funcs))
+def test_integer_maths(initial, funcs):
     """Simple maths with integers is fast and it's easy to make the functions,
     but Hypothesis makes the test surprisingly powerful.
     """
-    # Construct a list of unary functions on integers
-    ops = st.sampled_from([op.add, op.sub, op.floordiv, op.mul, op.pow])
-    funcs = [functools.partial(draw(ops), draw(st.integers()))
-             for _ in range(draw(st.integers(1, 10)))]
-    # Draw an initial value, and calculate the output as Result
-    initial = draw(st.integers())
     res = Result(initial)
     for func in funcs:
         res = res.then(func)
-    # Assert that the results were identical, or the same exception was thrown
     try:
         for func in funcs:
             initial = func(initial)
