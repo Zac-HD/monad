@@ -4,6 +4,12 @@ Monadic Control in Python
 This is an experimental module for playing with the result monad in Python,
 which interfaces fairly nicely with exceptions.
 
+It is inspired by Rust's ``Result`` type and pattern-matching.
+If you want to use something like this in your own code,
+the [`monad`](https://github.com/pyx/monad) or
+[`oslash`](https://github.com/dbrattli/OSlash) packages
+on pypi might be a better choice.
+
 As well as checking the ``res.ok`` and ``res.err`` values, you can
 ``res.unwrap()`` - which raises the ``err`` exception or returns the
 ``ok`` value.  It's also safe to use ``Result.unwrap`` on any other value -
